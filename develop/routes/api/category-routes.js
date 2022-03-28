@@ -6,12 +6,19 @@ const { Category, Product } = require('../../models');
 router.get('/', (req, res) => {
   // find all categories
   Category.findAll({
+    attributes: ['id', 'category_name'],
     include: [{
       model: Product,
       attributes: ['product_name', 'id', 'price', 'stock'],
     }]
   // be sure to include its associated Products
   })
+    .then(dbCategoryData => res.json(dbCategoryData))
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    }
+  );
 });
 
 router.get('/:id', (req, res) => {
@@ -23,6 +30,14 @@ router.get('/:id', (req, res) => {
     }]
   // be sure to include its associated Products
   })
+    .then(dbCategoryData => {
+      if (!dbCategoryData) {
+        res.status(404).json({ message: 'No category found with this id' });
+        return;
+      }
+      res.json(dbCategoryData);
+    }
+  )
 });
 
 router.post('/', (req, res) => {
@@ -52,6 +67,8 @@ router.delete('/:id', (req, res) => {
       id: req.params.id
     }
   })
+    .then(() => res.status(204).end())
+    .catch(err => res.status(500).json(err));
 });
 
 module.exports = router;
