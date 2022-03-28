@@ -32,9 +32,14 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   // find a single product by its `id`
   Product.findByPk(req.params.id, {
+    attributes: ['id','product_name', 'price', 'stock', 'category_id'],
     include: [{
         model: Category,
-        attributes: ['category_name', 'id', 'tag_name'],
+        attributes: ['category_name', 'id']
+      },
+      {
+        model: Tag,
+        attributes: ['tag_name', 'id'],  
       }]
   })
     .then(dbProductData => {
